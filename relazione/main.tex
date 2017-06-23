@@ -1,14 +1,14 @@
 % !TEX encoding = UTF-8
 % !TEX TS-program = pdflatex
 % !TEX root = ../main.tex
-% !TEX spellcheck = en-GB
+% !TEX spellcheck = it-IT
 
 \documentclass[final, 11pt, a4paper, titlepage]{article}
 \makeatletter
 \AtBeginDocument{\let\hl\@firstofone}
 \makeatother
 
-\usepackage[english]{babel}
+\usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[hidelinks]{hyperref}
 \usepackage{graphicx}
@@ -30,11 +30,11 @@
 \input{config/bibliography}
 
 \newcommand{\university}{Università degli Studi di Padova}
-\newcommand{\dept}{Department of Mathematics}
-\newcommand{\faculty}{Master Degree in Computer Science}
-\newcommand{\myyear}{Academic Year}
-\renewcommand{\title}{Title}
-\newcommand{\subtitle}{Subtitle}
+\newcommand{\dept}{Dipartimento di Matematica}
+\newcommand{\faculty}{Laurea Magistrale in Informatica}
+\newcommand{\myyear}{Anno Accademico 2016-17}
+\renewcommand{\title}{Making Android run on time}
+\newcommand{\subtitle}{Relazione}
 \renewcommand{\author}{Matteo Di Pirro}
 \newcommand{\matr}{1154231}
 
@@ -42,11 +42,13 @@
 	\input{config/titlepage}
 	\tableofcontents
 	\newpage
-	%\input{sections/nameOfTheSectionFile}	
+	\input{sections/javaPerRealTime}	
+	\input{sections/rtsj}
+	\input{sections/compilazione}
 	
-	%%bibliography
-	%\newpage
-	%\nocite{*}
-	%\printbibliography 
+	%bibliography
+	\newpage
+	\nocite{*}
+	\printbibliography 
 	
 \end{document}
