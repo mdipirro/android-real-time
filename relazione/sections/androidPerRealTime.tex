@@ -1,1 +1,38 @@
 \section{Prima valutazione sull'utilizzo di Android in contesti real-time}
+Fin dalla sua nascita Android ha generato moltissimo interesse intorno a sé. Il fatto di essere open-source gli permette di essere ben studiato e compreso. Inoltre chiunque può provare a fare dei miglioramenti o ad adattarlo in base alle proprie esigenze. Ricercatori e non hanno provato a fondo le funzionalità offerte, portando e proponendo modifiche a vari livelli per scopi diversi: sicurezza, uso nell'industria, ecc. In molti hanno anche studiato la possibilità di utilizzarlo in contesti real-time. 
+
+Tuttavia, Android non è stato pensato per un utilizzo in contesti con seri vincoli temporali. Molte scelte, architetturali e non, lo penalizzano in quest'ottica. Di seguito ne verranno analizzate alcune.
+
+\subsection{Garbage Collection}
+Il garbage collector di Android è di tipo stopping-the-world, e non può essere eseguito concorrentemente con l'applicazione. Inoltre, ogni applicazione in esecuzione ha un suo garbage collector. Il runtime controlla lo stato di tutti i thread, e il garbage collector viene eseguito solo quando nessun thread legato ad un processo è in esecuzione. Questo significa che l'applicazione è ferma mentre il runtime pulisce la memoria. La strategia di pulizia è di tipo mark-sweep, con tutti i vantaggi e gli svantaggi discussi nella Sezione~ref{sec:gc}.
+
+\subsection{Scheduler}
+Android utilizza lo stesso algoritmo di scheduling del kernel Linux, ovvero \textbf{Completely Fair Scheduling} (CFS), un algoritmo basato sul concetto di virtual clock. Quest'ultimo misura la quantità di tempo di processore che, in un sistema completamente fair, sarebbe stata data ad un processo in attesa. Linux non memorizza questa informazione, ma la calcola a partire da una struttura simile alla seguente:
+\begin{lstlisting}[language=c, caption={Entità schedulabile in Linux}, label={lst:schedentity}]
+struct sched_entity {
+	...
+	u64 exec_start;
+	u64 sum_exec_runtime;
+	u64 vruntime;
+	u64 prev_sum_exec_runtime;
+	...
+}
+\end{lstlisting}
+Quando un processo è assegnato ad una CPU, \texttt{exec\_start} è aggiornato all'istante attuale e il tempo di esecuzione è memorizzato in \texttt{sum\_exec\_runtime}. Quando il processo lascia la CPU \texttt{sum\_exec\_runtime} viene copiato in \texttt{prev\_sum\_exec\_runtime}. \texttt{sum\_exec\_runtime} è calcolato incrementalmente, cioè cresce monotonicamente. Infine, \texttt{vruntime} memorizza l'ammontare di tempo che è trascorso nel virtual clock durante l'esecuzione del processo. Quest'ultimo è incrementato della seguente quantità:
+\[ delta\_exec\_weighted = delta\_exec * \frac{NICE\_0\_LOAD}{load.weight}; \]
+dove \texttt{delta\_exec} è il tempo di CPU del processo e \texttt{load.weight} è il peso del processo. L'utilizzo a denominatore del peso può essere considerato come un fattore di correzione. Task con alta priorità (e con basso valore nice) avranno peso maggiore. Di conseguenza l'incremento di \texttt{vruntime} sarà piccolo. Run-time virtuale e fisico sono uguali quando per task con $nice = 0$ e priorità 120, cioè quando $load.weight = NICE\_0\_LOAD$. Solitamente un aumento di nice di 1 unità risulta in un tempo di CPU minore di circa 10\%. 
+
+La coda di esecuzione è mantenuta in un albero rosso nero e ogni coda (una per CPU) memorizza un campo \texttt{min\_vruntime}. Quest'ultimo rappresenta il più piccolo \texttt{vruntime} tra tutti i processi nella coda (di conseguenza può solo aumentare, e mai diminuire). Le chiavi per i nodi dell'albero rosso nero sono date da $vruntime - minruntime$, per ogni processo nella coda.
+
+Quando lo scheduler è invocato, il kernel prende il task con la chiave minore (che sarà memorizzato nella posizione più a sinistra), e gli assegna la CPU. Quindi gli elementi con chiave minore sono posizionati più a sinistra, e saranno eseguiti prima.
+
+Quando un processo esegue, il suo \texttt{vruntime} aumenta costantemente, fino a quando non si posizionerà nella parte più a destra dell'albero. Dato che questo campo aumenta più lentamente per i task ad alta priorità, loro si muoveranno verso destra più lentamente. Questo significa che loro hanno più possibilità di essere eseguiti rispetto a quelli a bassa priorità, come è giusto che sia. Se un processo è in attesa il suo \texttt{vruntime} resta inalterato, ma dato che il \texttt{min\_runtime} della cosa aumenta costantemente prima o poi q	uel processo verrà svegliato perché la sua chiave è diventata la minore. 
+
+In questo protocollo non ci sono possibilità di starvation, dato che prima o poi tutti verranno eseguiti. Inoltre, se un task si mette in attesa per I/O verrà ricompensato con tutta la quantità di tempo che è stata necessaria per completare l'operazione. 
+
+Lo scheduler di Linux è modulare e prevede diverse classi di scheduling per poter utilizzare diversi algoritmi/politiche per diverse occasioni. Una classe di scheduling di fatto fornisce un'interfaccia allo scheduler principale per permettere di gestire task usando diversi algoritmi. Come previsto dallo standard POSIX, Linux dispone di due classi soft real-time: \textbf{SCHED\_RR}, per politiche round robin, e \textbf{SCHED\_FIFO}, per politiche FIFO. Android però fa scheduling utilizzando prevalentemente \textbf{SCHED\_OTHER}, che non offre nessun supporto real-time.
+
+Di conseguenza lo scheduling di Android da più importanza alla fairness, una proprietà che non interessa ai sistemi real-time. 
+
+\subsection{Gestione di interruzioni ed eventi}In terms of interrupt/event handling, these are performed
+Il kernel è responsabile di notificare l'applicazione quando arriva un'interruzione o si verifica un evento. Purtroppo però nessuna componente coinvolta in questo meccanismo ha la nozione di restrizioni temporali. Inoltre in Linux le interruzioni sono task con la massima priorità. Quindi un task in esecuzione ad alta priorità (ma non massima) può essere prerilasciato dall'arrivo di una interruzione. A causa di questo grande problema il sistema non può essere considerato completamente prevedibile.
