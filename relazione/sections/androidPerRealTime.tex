@@ -18,7 +18,7 @@ struct sched_entity {
 	...
 }
 \end{lstlisting}
-Quando un processo è assegnato ad una CPU, \texttt{exec\_start} è aggiornato all'istante attuale e il tempo di esecuzione è memorizzato in \texttt{sum\_exec\_runtime}. Quando il processo lascia la CPU \texttt{sum\_exec\_runtime} viene copiato in \texttt{prev\_sum\_exec\_runtime}. \texttt{sum\_exec\_runtime} è calcolato incrementalmente, cioè cresce monotonicamente. Infine, \texttt{vruntime} memorizza l'ammontare di tempo che è trascorso nel virtual clock durante l'esecuzione del processo. Quest'ultimo è incrementato della seguente quantità:
+Quando un processo è assegnato ad una CPU, \texttt{exec\_start} è aggiornato all'istante attuale e il tempo di esecuzione è memorizzato in \texttt{sum\_exec\_runtime}. Quando il processo lascia la CPU \texttt{sum\_exec\_runtime} viene copiato in \\\texttt{prev\_sum\_exec\_runtime}. \texttt{sum\_exec\_runtime} è calcolato incrementalmente, cioè cresce monotonicamente. Infine, \texttt{vruntime} memorizza l'ammontare di tempo che è trascorso nel virtual clock durante l'esecuzione del processo. Quest'ultimo è incrementato della seguente quantità:
 \[ delta\_exec\_weighted = delta\_exec * \frac{NICE\_0\_LOAD}{load.weight}; \]
 dove \texttt{delta\_exec} è il tempo di CPU del processo e \texttt{load.weight} è il peso del processo. L'utilizzo a denominatore del peso può essere considerato come un fattore di correzione. Task con alta priorità (e con basso valore nice) avranno peso maggiore. Di conseguenza l'incremento di \texttt{vruntime} sarà piccolo. Run-time virtuale e fisico sono uguali quando per task con $nice = 0$ e priorità 120, cioè quando $load.weight = NICE\_0\_LOAD$. Solitamente un aumento di nice di 1 unità risulta in un tempo di CPU minore di circa 10\%. 
 
@@ -34,5 +34,17 @@ Lo scheduler di Linux è modulare e prevede diverse classi di scheduling per pot
 
 Di conseguenza lo scheduling di Android da più importanza alla fairness, una proprietà che non interessa ai sistemi real-time. 
 
-\subsection{Gestione di interruzioni ed eventi}In terms of interrupt/event handling, these are performed
+\subsection{Gestione di interruzioni ed eventi}
 Il kernel è responsabile di notificare l'applicazione quando arriva un'interruzione o si verifica un evento. Purtroppo però nessuna componente coinvolta in questo meccanismo ha la nozione di restrizioni temporali. Inoltre in Linux le interruzioni sono task con la massima priorità. Quindi un task in esecuzione ad alta priorità (ma non massima) può essere prerilasciato dall'arrivo di una interruzione. A causa di questo grande problema il sistema non può essere considerato completamente prevedibile.
+
+\subsection{Framework applicativo}
+\subsubsection{Costrutti e API}
+Tra tutti i componenti forniti da Android, \texttt{Looper} e \texttt{Handler} sono i più problematici e pervasivi. Anche se un'applicazione non li usa esplicitamente, questi vengono implicitamente utilizzati dal runtime per controllarne il flusso. Il problema principale è che la latenza della consegna dei messaggi a questi componenti non è prevedibile: thread con bassa priorità possono impedire a thread con priorità più alta di eseguire, senza motivo. 
+
+\paragraph{Handler.} Un \texttt{Handler} permette al programmatore di inviare e processare messaggi e \texttt{Runneble} associati con dei thread. Ogni \texttt{Handler} è associato con un singolo thread e con la sua coda di messaggi. Quando viene creato viene fatto un binding con il thread, e da quel momento la sua responsabilità è consegnare messaggi e \texttt{Runnable} alla cosa e processarli quando vengono estratti.
+
+\paragraph{Looper.} \texttt{Looper} viene utilizzato per ''aumentare'' un thread con una coda di messaggi. Normalmente un thread non ha una coda, ma \texttt{Looper} permette di create tale coda in un thread e di gestirla tramite \texttt{Handler}.
+
+
+\subsubsection{Servizi di sistema}
+L'implementazione di servizi come \texttt{SensorManager} o \texttt{AlarmManager}, utilizzati fortemente in applicazioni per il sensing dell'ambiente circostante, non tengono conto di eventuali vincoli temporali.
