@@ -2,7 +2,7 @@
 Storicamente le performance delle applicazioni Java sono sempre state molto criticate. Java è stato progettato per essere interpretato e portabile: i primi runtime avevano performance significativamente più basse dei concorrenti. Nel corso degli ultimi anni, però, i runtime Java hanno introdotto compilatori dinamici molto sofisticati: i compilatori JIT. Questi compilano selettivamente i metodi più frequentemente eseguiti in codice nativo durante l'esecuzione. Il fatto di compilare i metodi durante l'esecuzione, e non allo start-up, mantiene la portabilità. Grazie a questo, inoltre, le performance risultano incredibilmente migliorate. 
 
 \subsection{Compilazione Just-in-time}
-Figura\ref{fig:jit} mostra un esempio di compilazione just-in-time. 
+Figura~\ref{fig:jit} mostra un esempio di compilazione just-in-time. 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.7\linewidth]{jvmjit}
@@ -36,7 +36,7 @@ Compilare tutto il codice può non essere una buona scelta: il codice nativo occ
 Il codice AOT, sebbene più lento di quello JIT, è molto più veloce del codice interpretato. Inoltre l'incremento di performance si ottiene più velocemente, perché non si devono compilare al volo metodi eseguiti frequentemente. Le applicazioni real-time, in particolare, traggono numerosi benefici da questo approccio. Le performance sono migliori e più deterministiche rispetto a JIT. 
 
 \subsection{Confronto}
-Figura\ref{fig:performanceaotvsjit} mostra un confronto basato sulle performance. 
+Figura~\ref{fig:performanceaotvsjit} mostra un confronto basato sulle performance. 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.7\linewidth]{performanceaotvsjit}
