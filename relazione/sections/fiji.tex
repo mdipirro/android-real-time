@@ -69,6 +69,15 @@ Una categoria alternativa è data dagli algoritmi \textbf{mark-region}. Questi u
 
 \input{sections/immix}
 
+\subsubsection{Versione utilizzata in Fiji}
+fVm supporta un GC simile a Immix, nel senso che opera a blocchi e linee, ma non supporta la deframmentazione, e quindi incorre in un overhead a livello di prestazioni dell'applicazione. Il GC può essere eseguito in due modalità: concorrentemente all'applicazione (in un ambiente multiprocessore) o in modalità slack-based, ad una priorità ben definita. In entrambi i casi un'allocazione andata a buon fine non comporta mai una collezione. Se il GC esegue ad una priorità più bassa di un certo thread, quel thread verrà sospeso se e solo se la richiesta di memoria che è stata fatta non può essere soddisfatta.
+
+Il GC di Fiji deve essere diverso da Immix per via della compilazione in codice C. Implementare la GC in linguaggi che non la prevedono (come C) è generalmente complicato, perché questi linguaggi non danno nessun supporto all'analisi dello stack dei singoli thread. una possibile soluzione è quella di salvare ogni puntatore locale in una struttura dati locale al thread e accessibile dal GC. Questo approccio in Fiji può essere ottimizzato, perché (ecco perché non c'è deframmentazione) gli oggetti non vengono mai spostati. Di conseguenza la maggior parte dei salvataggi in questa struttura dati possono essere vitate (ad esempio se si sa già che il puntatore è presente). 
+
+Un altro problema riguarda il bisogno di analizzare lo stack di ogni thread ad ogni collezione. Tuttavia sappiamo che, generalmente, gli stack dei thread real-time sono di dimensione piccola (perché i compiti da svolgere stessi sono atomici e quindi non richiedono troppe allocazioni. Inoltre il codice dovrebbe essere ottimizzato per eseguire in poco tempo) e che (in modalità slack-based) il GC esegue solo perché nessun altro thread lo ha prerilasciato. Quindi, se una scansione dello stack è in corso, questa finirà molto velocemente per i thread real-time (stack piccoli) e non è necessario aspettare che il thread sia in uno stato consistente, proprio perché il thread in questione ha finito di eseguire (altrimenti eseguirebbe lui e non il GC). Di conseguenza, anche se i thread real-time non possono eseguire durante la scansione, questa sarà molto veloce (nell'ordine dei microsecondi). Diversi test hanno dimostrato che la prevedibilità e le prestazioni non vengono impattate da questo problema.
+
+Infine, tutte le operazioni riguardanti thread e I/O vengono passate al sistema operativo, che fornisce un supporto nativo. 
+
 \subsection{Valutazione}
 Figura~\ref{fig:fijicomp} mostra un confronto di varie VM progettate per sistemi real-time (fVM e WebSphere) e fortemente ottimizzate (Hotspot). 
 \begin{figure}[h]

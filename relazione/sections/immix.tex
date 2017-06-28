@@ -51,13 +51,13 @@ Figura~\ref{fig:heapallocation} mostra l'efficienza in termini di spazio. Si not
 Figura~\ref{fig:rtgc} mostra invece un confronto basato sulle performance dell'applicazione (Figura~\ref{fig:mutuatorPerformance}) e del processo di pulizia. (Figura~\ref{fig:fastCollection}). Come prevedibile la prima indica che le strategie SS e MC consentono all'applicazione prestazioni molto alte. Il motivo è, naturalmente, che queste due strategie allocano gli oggetti in maniera contigua, e di conseguenza l'applicazione ha tempi di esecuzione minori. AL contrario MS si comporta molto male, perché la sua politica causa molta frammentazione nella memoria. Immix si posiziona molto più in basso (e quindi ha un risultato molto migliore) di MS, arrivando quasi agli stessi livelli di SS e MC. Questo grazie alla deframmentazione opportunistica che viene eseguita on-demand solo quando è necessario. L'esecuzione on-demand consente ad Immix di non incorrere in un peggioramento di performance significativo durante la pulizia, come si può notare in Figura~\ref{fig:fastCollection}. Il tempo di collezione è praticamente uguale a quello di MS. Il risultato è coerente dato che il principio di base è lo stesso, l'unica variazione è la granularità a cui Immix opera. Al contrario MC e SS richiedono molto più tempo, come prevedibile dato che mantengono la memoria contigua ad ogni pulizia, e quindi incorrono in un overhead significativo.
 \begin{figure}
 	\centering
-	\begin{subfigure}[b]{0.5\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{mutuatorPerformance}
 		\caption{Performance dell'applicazione sotto GC}
 		\label{fig:mutuatorPerformance}
 	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.5\textwidth}
+	~
+	\begin{subfigure}[b]{0.4\textwidth}
 		\includegraphics[width=\textwidth]{fastCollection}
 		\caption{Tempo richiesto per la pulizia}
 		\label{fig:fastCollection}
