@@ -56,7 +56,7 @@ Per allocare memoria viene fatto un primo tentativo con del codice C per salvare
 \paragraph{Sincronizzazione} \mbox{} \\
 Viene utilizzato codice C per acquisire velocemente il lock e codice specifico per permettere la gestione dei lock rispettando RTSJ. I lock del SO sono utilizzati internamente, e l'implementazione è molto più efficiente rispetto a quella ottenuta utilizzando solamente C.
 
-\subsection{Garbage Collection}
+\subsection{Garbage Collection} \label{sec:gc}
 Esistono principalmente tre famiglie di algoritmi di GC:
 \begin{itemize}
 	\item \textbf{Sweep-to-free-list}: basano l'intero processo di allocazione/rimozione su una lista di posizioni libere. Strategie di questo tipo sono dette \textit{non-moving}, nel senso che gli oggetti non vengono mai spostati una volta allocati. Per questo sono molto efficienti in termini di tempo e spazio, ma non forniscono località agli oggetti allocati. Un esempio sono gli algoritmi \textbf{mark-sweep};
