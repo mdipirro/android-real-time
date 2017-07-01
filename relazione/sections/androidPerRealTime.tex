@@ -39,12 +39,30 @@ Il kernel è responsabile di notificare l'applicazione quando arriva un'interruz
 
 \subsection{Framework applicativo}
 \subsubsection{Costrutti e API}
-Tra tutti i componenti forniti da Android, \texttt{Looper} e \texttt{Handler} sono i più problematici e pervasivi. Anche se un'applicazione non li usa esplicitamente, questi vengono implicitamente utilizzati dal runtime per controllarne il flusso. Il problema principale è che la latenza della consegna dei messaggi a questi componenti non è prevedibile: thread con bassa priorità possono impedire a thread con priorità più alta di eseguire, senza motivo. 
+Tra tutti i componenti forniti da Android, \texttt{Looper} e \texttt{Handler} sono i più problematici e pervasivi. Anche se un'applicazione non li usa esplicitamente, questi vengono implicitamente utilizzati dal runtime per controllarne il flusso, in particolare le transizioni tra gli stati di una Activity. Il problema principale è che la latenza della consegna dei messaggi a questi componenti non è prevedibile: thread con bassa priorità possono impedire a thread con priorità più alta di eseguire, senza motivo. 
 
-\paragraph{Handler.} Un \texttt{Handler} permette al programmatore di inviare e processare messaggi e \texttt{Runneble} associati con dei thread. Ogni \texttt{Handler} è associato con un singolo thread e con la sua coda di messaggi. Quando viene creato viene fatto un binding con il thread, e da quel momento la sua responsabilità è consegnare messaggi e \texttt{Runnable} alla cosa e processarli quando vengono estratti.
-
-\paragraph{Looper.} \texttt{Looper} viene utilizzato per ''aumentare'' un thread con una coda di messaggi. Normalmente un thread non ha una coda, ma \texttt{Looper} permette di create tale coda in un thread e di gestirla tramite \texttt{Handler}.
-
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{looperHandler}
+	\caption{Utilizzo di \texttt{Looper} e \texttt{Handler}}
+	\label{fig:looperhandler}
+\end{figure}
+Figura~\ref{fig:looperhandler} mostra il funzionamento dei due costrutti. \texttt{Looper} si occupa di mantenere in un thread una coda di messaggi e di inviarli all'\texttt{Handler} opportuno, che li processerà. Il programmatore fornisce la logica per processare il messaggio implementando il metodo \texttt{handleMessage()} di \texttt{Handler}. Un'istanza di \texttt{Handler} è condivisa tra due thread per inviare e ricevere messaggi. Questo meccanismo è problematico quando più thread a priorità diverse inviano messaggi contemporaneamente. Ci sono due modi in cui i messaggi vengono processati. Di default l'ordine seguito è quello di ricezione. In aggiunta, però, un mittente può specificare un istante temporale nel quale il messaggio dovrà essere processato. In entrambi i casi però non viene considerata la priorità dei thread coinvolti. Se molti thread non real-time inviano simultaneamente messaggi allo stesso thread, insieme ad uno real-time, i messaggi di quest'ultimo saranno considerati solo dopo tutti i messaggi precedenti (Figura~\ref{fig:looperhandlerissue}). Inoltre, se altri thread non real-time inviano messaggi specificando un istante per processarli, la coda viene riordinata a run-time per fare in modo che questi messaggi vengano considerati in quel preciso istante. Questo significa che un thread real-time ad alta priorità può vedersi passare avanti un sacco di messaggi inviati da altri thread con una priorità molto più bassa.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{looperHandlerissue}
+	\caption{Scenario di ritardo per un thread real-time}
+	\label{fig:looperhandlerissue}
+\end{figure}
 
 \subsubsection{Servizi di sistema}
-L'implementazione di servizi come \texttt{SensorManager} o \texttt{AlarmManager}, utilizzati fortemente in applicazioni per il sensing dell'ambiente circostante, non tengono conto di eventuali vincoli temporali.
+L'implementazione di servizi come \texttt{SensorManager} o \texttt{AlarmManager}, utilizzati fortemente in applicazioni per il sensing dell'ambiente circostante, non tengono conto di eventuali vincoli temporali. 
+
+\paragraph{AlarmManager.} Un'applicazione che vuole impostare un allarme invia un messaggio ad \texttt{AlarmManager}. Quando l'allarme scatta, all'istante specificato dall'applicazione, questa viene notificata e un metodo di callback, definito all'invio del primo messaggio, viene eseguito. Il problema è che non viene data nessuna garanzia sul tempo trascorso dallo scattare dell'allarme al momento in cui l'applicazione ne viene a conoscenza. 
+
+\paragraph{SensorManager.}
+Un'applicazione può ascoltare l'ambiente circostante attraverso le API di \texttt{SensorManager} e fornire delle callback. Queste vengono chiamate ogni volta che un evento di interesse si verifica. Ci sono due principali problemi: 
+\begin{itemize}
+	\item non c'è nessun supporto per le priorità dei thread, dato che tutti gli eventi finiscono nella stessa coda. Un thread ad alta priorità può dover aspettare un sacco di thread a priorità minore prima di ricevere i dati di cui ha bisogno;
+	\item la consegna degli eventi avviene tramite uno scambio di messaggi tra tutte le classi coinvolte nel sensing. Android non fornisce nessuna garanzia sul tempo necessario a consegnare questi messaggi.
+\end{itemize}
