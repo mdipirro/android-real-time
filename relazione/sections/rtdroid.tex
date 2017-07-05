@@ -34,7 +34,7 @@ Quando un'applicazione registra un nuovo listener per un sensore viene di fatto 
 \subsection{Sostituire componenti non real-time con componenti real-time}
 Il kernel Linux di Android ha molte modifiche per renderlo adatto all'utilizzo in un ambiente con risorse limitate. Questo diventa un problema quando si cerca di sostituire alcuni componenti per migliorare il supporto real-time.
 
-\paragraph{Bionic.} Un esempio è dato dalle librerie C native. Al posto di \texttt{glibc} Android utilizza \textit{Bionic}. Bionic è una libreria C leggera e altamente semplificata ed ottimizzata in modo da poter essere utilizzata in ambienti con risolrse limitate, in particolare CPU a bassa frequenza e poca memoria. Sfortunatamente però non aderisce alla specifica POSIX e non supporta le estensioni real-time di mutex e pthreads. Una modifica di questa libreria è necessaria per utilizzare una VM real-time, come Fiji.
+\paragraph{Bionic.} Un esempio è dato dalle librerie C native. Al posto di \texttt{glibc} Android utilizza \textit{Bionic}. Bionic è una libreria C leggera e altamente semplificata ed ottimizzata in modo da poter essere utilizzata in ambienti con risolrse limitate, in particolare CPU a bassa frequenza e poca memoria. Tra le funzionalità eliminate c'è la gestione delle eccezioni C++, che provoca un grandissimo overhead in \texttt{glibc}. Questa esclusione non è però problematica, dato che Android si basa su Java, e dunque le eccezioni sono gestite più ad alto livello, tramite Java. Sfortunatamente però non aderisce alla specifica POSIX e non supporta le estensioni real-time di mutex e pthreads. Una modifica di questa libreria è necessaria per utilizzare una VM real-time, come Fiji.
 
 \paragraph{Patch del kernel incompatibili.} Android ha introdotto molte modifiche al kernel Linux, tanto che l'applicazione automatica di patch per ottenere RTLinux è impossibile, e deve essere fatta manualmente. Anche dopo averla fatta manualmente, comunque, il kernel rimane non completamente prerilasciabile e questo comporta alti tempi di attesa possibili. 
 
@@ -189,7 +189,29 @@ Il test vede due servizi real-time (alta priorità) che si scambiano messaggi (u
 	\item message noise, inviano un messaggio a bassa priorità al service receiver ogni 200ms.
 \end{itemize}
 
-Figura~???? mostra le misurazioni delle prestazioni. Lo scambio di messaggi consiste nell'allocazione del messaggio (da parte del mittente), nella sua consegna e nel context switch mittente/destinatario. Figura~??? mostra la situazione con solo mittente e destinatario, e serve per i confronti. Viene mostrata la latenza per 2000 eventi generati dallo scambio dei messaggi. Per ogni evento si definisce:
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{messagePassing}
+		\caption{Scambio di messaggi}
+		\label{fig:messagePassing}
+	\end{subfigure}
+	~ 
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{intentBroadcast}
+		\caption{Intent broadcast}
+		\label{fig:intentBroadcast}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{bulkData}
+		\caption{Trasferimento di dati pesanti}
+		\label{fig:bulkData}
+	\end{subfigure}
+	\caption{Baseline per la valutazione delle prestazioni dei canali}\label{fig:baselines}
+\end{figure}
+
+Figura~\ref{fig:baselines} mostra le misurazioni delle prestazioni senza interferenza. Lo scambio di messaggi consiste nell'allocazione del messaggio (da parte del mittente), nella sua consegna e nel context switch mittente/destinatario. Figura~\ref{fig:messagePassing} mostra la situazione con solo mittente e destinatario. Viene mostrata la latenza per 2000 eventi generati dallo scambio dei messaggi. Per ogni evento si definisce:
 \begin{itemize}
 	\item \textbf{message allocation latency}: tempo necessario per istanziare un messaggio;
 	\item \textbf{message passing latency}: tempo necessario per la consegna;
@@ -202,12 +224,152 @@ Un esperimento simile viene fatto con gli intents. Il mittente invia un intent o
 	\item \textbf{intent delivery latency}: latenza complessiva per ogni intent;
 	\item \textbf{callback trigger latency}: tempo richiesto per generare una nuova callback.
 \end{itemize}
-I risultati sono mostrati in Figura~???, e sono simili a quelli precedenti.
+I risultati sono mostrati in Figura~\ref{fig:intentBroadcast}, e sono simili a quelli precedenti.
 
-Allo stesso modo, Figura~??? mostra la baseline per il trasferimento di dati di grosse dimensioni. La \textbf{transfer latency} è il tempo di consegna di un intent con un payload molto pesante.
+Allo stesso modo, Figura~\ref{fig:bulkData} mostra la baseline per il trasferimento di dati di grosse dimensioni. La \textbf{transfer latency} è il tempo di consegna di un intent con un payload molto pesante.
 
-Figura~??? mostra i grafici CDF (cumulative distribution function) che confrontano le prestazioni dei tre tipi di canali. In particolare, i CDF illustrano che percentuale dei punti misurati è minore o uguale di un certo valore temporale. Per il messaging (Figura~???), indipendentemente dal carico a cui è sottoposto, RTDroid si comporta bene (non ci sono grossi cambiamenti di latenza). Sebbene i risultati siano simili per gli intents (Figura~???), si nota un overhead maggiore rispetto al messaging semplice. Questo era prevedibile, dato che l'intent è associato all'esecuzione di una callback. Figura~??? mostra i risultati per il trasferimento di dati di diverse dimensioni. RTDroid praticamente non risente del cambiamento di dimensioni (giustamente, perché non fa nessuna copia dei dati).
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{messagePassingLatency}
+		\caption{CDF per lo scambio di messaggi}
+		\label{fig:messagePassingLatency}
+	\end{subfigure}
+	~ 
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{intentDeliveryLatency}
+		\caption{CDF per il broadcast di Intent}
+		\label{fig:intentDeliveryLatency}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{bulkdatalatency}
+		\caption{CDF per il trasferimento di dati pesanti}
+		\label{fig:bulkdatalatency}
+	\end{subfigure}
+	\caption{CDF delle prestazioni dei canali}\label{fig:cdfchannels}
+\end{figure}
+
+Figura~\ref{fig:cdfchannels} mostra i grafici CDF (cumulative distribution function) che confrontano le prestazioni dei tre tipi di canali. In particolare, i CDF illustrano che percentuale dei punti misurati è minore o uguale di un certo valore temporale. Per il messaging (Figura~\ref{fig:messagePassingLatency}), indipendentemente dal carico a cui è sottoposto, RTDroid si comporta bene (non ci sono grossi cambiamenti di latenza). Sebbene i risultati siano simili per gli intents (Figura~\ref{fig:intentDeliveryLatency}), si nota un overhead maggiore rispetto al messaging semplice. Questo era prevedibile, dato che l'intent è associato all'esecuzione di una callback. Figura~\ref{fig:bulkdatalatency} mostra i risultati per il trasferimento di dati di diverse dimensioni. RTDroid praticamente non risente del cambiamento di dimensioni (giustamente, perché non fa nessuna copia dei dati).
 
 \subsection{Confronto con Android e con RTSJ}
+Per confrontare RTDroid con Android e RTSJ vengono utilizzate tre applicazioni con vincoli temporali.
+\paragraph{Cochlear Implant.}
+Questa applicazione ha un service real-time per processare segnali audio e un receiver real-time per controllare che non ci siano errori nell'output. Ogni esecuzione del primo comporta l'acquisizione di 128 campioni, la loro elaborazione e il loro invio al receiver. Tutto questo non deve occupare più di 8ms. 
 
+\paragraph{jPapaBench.} jPapaBench è un benchmark Java real-time che simula un software di controllo aereo. La versione utilizzata per la valutazione ha due services: un pilota automatico che esegue sensing, stabilizzazione e controlli vari e un fly-by-wire che gestisce i comandi radio e i controlli di sicurezza. La comunicazione originale è rimpiazzata con broadcast di intent. Il task di stabilizzazione ha una deadline di 50ms.
 
+\paragraph{Wind Turbine Health Monitoring.} Questa applicazione è stata originariamente implementata utilizzando RTSJ. Dato che richiede hardware specializzato non è stata implementata in Android. Il suo compito è di rilevare rotture nelle turbine basandosi sui segnali acustici che emettono. Si compone di un task che emette un segnale audio, di uno che lo rileva e lo memorizza e di un terzo che rileva le rotture analizzando i segnali rilevati. La rilevazione deve avvenire ogni 50ms. In questo caso, la dimensione dei dati raccolti per ogni test sfiora i 2MB ed è quindi necessario sfruttare canali di comunicazione adatti. RTSJ, che non dispone dei canali di RTDroid, utilizza un buffer di memoria condiviso.
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{cochlear}
+		\caption{Cochlear Implant}
+		\label{fig:cochlear}
+	\end{subfigure}
+	~ 
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{jpapabench}
+		\caption{jPapaBench}
+		\label{fig:jpapabench}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{turbine}
+		\caption{Wind Turbine Health Monitoring}
+		\label{fig:turbine}
+	\end{subfigure}
+	\caption{Misurazione delle prestazioni}\label{fig:appperformance}
+\end{figure}
+
+Figura~\ref{fig:appperformance} mostra la durata delle esecuzioni per ogni release. I grafici mostrano che l'utilizzo della memoria scoped e la comunicazione attraverso canali real-time aumenta il tempo di esecuzione di ogni release, ma con un overhead limitato. Android, al contrario, è tutto fuori che prevedibile, come mostrato in Figura~\ref{fig:performancenx5}. Infatti la varianza nella durata è altissima. 
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{cochlearAudioproc}
+		\caption{Cochlear Implant: Durata dell'elaborazione audio}
+		\label{fig:cochlearAudioproc}
+	\end{subfigure}
+	~ 
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{jpapabenchStabilization}
+		\caption{jPapaBench: Durata della stabilizzazione}
+		\label{fig:jpapabenchStabilization}
+	\end{subfigure}
+	\caption{Prestazioni su un Nexus5}\label{fig:performancenx5}
+\end{figure}
+
+Figura~\ref{fig:statduratabench} quantifica i risultati delle precedenti figure. Come già visto, sia RTDroid che RTSJ aggiungono overhead nelle esecuzioni. In jPapaBench RTDroid si comporta peggio di RTSJ. Quest'ultima esegue la stabilizzazione semplicemente leggendo i dati dei sensori da un buffer condiviso, li elabora ed esegue controlli basati sempre sul buffer condiviso. RTDroid, al contrario, utilizza i canali di comunicazione descritti sopra al posto di buffer condivisi, e quindi incorre in un maggiore overhead. Si nota comunque che Android è molto più veloce ad eseguire i compiti, ma ha un'alta percentuale di deadline mancate, inaccettabile in un sistema real-time.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\linewidth]{statDurataBench}
+	\caption{Statistiche della durata delle esecuzioni}
+	\label{fig:statduratabench}
+\end{figure}
+
+Figura~\ref{fig:cdfappperformance} mostra i CDF degli esperimenti condotti. Le curve di RTSJ e di RTDroid sono simili. Basandoci su questi dati, e sui dati di Figura~\ref{fig:statduratabench} si può concludere che RTDroid aggiunge latenza, ma che questa non ha un impatto significativo sulla prevedibilità delle applicazioni che vengono eseguite. Ancora una volta, questo overhead è dovuto al paradigma di comunicazione utilizzato. 
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{cochlearCDF}
+		\caption{CDF per Cochlear Implant}
+		\label{fig:cochlearcdf}
+	\end{subfigure}
+	~ 
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{jpapabenchCDF}
+		\caption{CDF per jPapaBench}
+		\label{fig:jpapabenchcdf}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{turbine}
+		\caption{CDF per Wind Turbine Health MonitoringCDF}
+		\label{fig:turbinecdf}
+	\end{subfigure}
+	\caption{CDF per la misurazione delle prestazioni}\label{fig:cdfappperformance}
+\end{figure}
+
+Figura~\ref{fig:cdfaudionx5} e Figura~\ref{fig:cdfstabnx5} mostrano i CDF del confronto con Android. Non sorprendentemente si nota che una porzione non banale di release in Android incorre in ritardi significativi, anche quando il sistema non è sovraccarico. Sebbene RTDroid aggiunga un overhead rispetto a RTSJ, il beneficio rispetto ad Android è enorme. La complessità delle operazioni sottostanti (gestione della memoria scoped) è nascosta dal design, e il sistema disaccoppia configurazione dei task real-time (manifest) dalla logica dell'applicazione (codice Java). Inoltre semplifica la comunicazione attraverso diversi tipi di canali in pieno stile Android. Figura~\ref{fig:codecomplx} mostra delle tipiche misure di complessità del codice scritto per le tre piattaforme analizzate, escludendo le librerie esterne utilizzate. Applicazioni scritte per RTDroid sono composte da meno linee di codice. RTSJ, infatti, richiede che i programmatori facciano tutto a mano: creazione dei task e rilascio a multi-threading. In RTDroid tutta la complessità è nascosta e i componenti sono dichiarati nel manifest, in modo che il sistema possa gestirli in automatico sulla base della configurazione fornita. Inoltre, dato che è previsto un paradigma di comunicazione esplicito, non è necessario che i programmatori scrivano codice per la sincronizzazione della comunicazione, riducendo il rischio di errori.
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{audioprocRTDroid}
+		\caption{Durata dell'elaborazione audio su RTDroid}
+		\label{fig:cochlearAudioprocRT}
+	\end{subfigure}
+	~ 
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{audioprocAndroid}
+		\caption{Durata dell'elaborazione audio su Android}
+		\label{fig:cochlearAudioprocAN}
+	\end{subfigure}
+	\caption{CDF per l'elaborazione audio su un Nexus5}\label{fig:cdfaudionx5}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{stabilizationRTDroid}
+		\caption{Durata della stabilizzazione su RTDroid}
+		\label{fig:stabilizationRTDroid}
+	\end{subfigure}
+	~ 
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{stabilizationAndroid}
+		\caption{Durata della stabilizzazione su Android}
+		\label{fig:stabilizationAndroid}
+	\end{subfigure}
+	\caption{CDF per la stabilizzazione su un Nexus5}\label{fig:cdfstabnx5}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{codecomplx}
+	\caption{Complessità del codice}
+	\label{fig:codecomplx}
+\end{figure}
