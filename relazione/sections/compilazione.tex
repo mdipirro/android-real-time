@@ -3,9 +3,9 @@ Storicamente le performance delle applicazioni Java sono sempre state molto crit
 
 \subsection{Compilazione Just-in-time}
 Figura~\ref{fig:jit} mostra un esempio di compilazione just-in-time. 
-\begin{figure}
+\begin{figure}[h]
 	\centering
-	\includegraphics[width=0.7\linewidth]{jvmjit}
+	\includegraphics[width=0.5\linewidth]{jvmjit}
 	\caption[Compilatore JIT]{Compilatore JIT}
 	\label{fig:jit}
 \end{figure}
@@ -26,7 +26,7 @@ Dato che è necessaria una fase di ''training'' per capire quali parti compilare
 Alcune applicazioni, però, non possono tollerare il ritardo introdotto dalla compilazione. Un esempio sono quelle da eseguire real-time.
 
 \subsection{Compilazione Ahead-of-time}
-La compilazione AOT la trasformazione in codice nativo avviene a priori, prima dell'esecuzione. Questo evita i problemi di analisi del codice e del ritardo di esecuzione, ma introduce altre problematiche. Una di queste è dovuta al caricamento dinamico delle classi. Il compilatore in questo caso non può fare nessuna assunzione riguardo a quali classi saranno caricate. Queste possono risiedere in altre macchine oppure non esistere affatto prima dell'esecuzione (con meccanismi di reflection è possibile creare classi ''al volo'', durante l'esecuzione). Questa è una grande limitazione, perché inibisce alcune delle più importanti ottimizzazioni effettuate dai compilatori, tra cui l'inlining. 
+Nella compilazione AOT la trasformazione in codice nativo avviene a priori, prima dell'esecuzione. Questo evita i problemi di analisi del codice e del ritardo di esecuzione, ma introduce altre problematiche. Una di queste è dovuta al caricamento dinamico delle classi. Il compilatore in questo caso non può fare nessuna assunzione riguardo a quali classi saranno caricate. Queste possono risiedere in altre macchine oppure non esistere affatto prima dell'esecuzione (con meccanismi di reflection è possibile creare classi ''al volo'', durante l'esecuzione). Questa è una grande limitazione, perché inibisce alcune delle più importanti ottimizzazioni effettuate dai compilatori, tra cui l'inlining. 
 
 Il codice deve quindi essere generato con tutti i riferimenti non risolti. Durante l'esecuzione ogni riferimento utilizzato è aggiornato con il suo valore reale. Questo può comportare una penalità nella prima esecuzione, perché tutti i riferimenti sono sconosciuti, ma le esecuzioni successive non soffriranno di ritardi.
 
@@ -39,7 +39,7 @@ Il codice AOT, sebbene più lento di quello JIT, è molto più veloce del codice
 Figura~\ref{fig:performanceaotvsjit} mostra un confronto basato sulle performance. 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.7\linewidth]{performanceaotvsjit}
+	\includegraphics[width=0.4\linewidth]{performanceaotvsjit}
 	\caption[Confronto di performance]{Confronto di performance}
 	\label{fig:performanceaotvsjit}
 \end{figure}

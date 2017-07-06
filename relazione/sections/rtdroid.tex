@@ -9,7 +9,7 @@ Ad ogni messaggio viene assegnata una priorità, attraverso due modalità:
 	\item\textit{inheritance}: il messaggio eredita la priorità del mittente;
 	\item\textit{inheritance + specified}: il mittente può specificare una priorità relativa a tutti i messaggi inviati.
 \end{itemize}
-Dopodiché viene definita una coda per ogni priorità, con associata un \texttt{Looper} e un \texttt{Handler}. Messaggi a priorità più bassa non ritarderanno quelli a priorità più alta. Per avere garanzie sulla quantità di memoria utilizzata, le code possono essere dimensionate staticamente.
+Dopodiché viene definita una coda per ogni priorità, con associati un \texttt{Looper} e un \texttt{Handler}. Messaggi a priorità più bassa non ritarderanno quelli a priorità più alta. Per avere garanzie sulla quantità di memoria utilizzata, le code possono essere dimensionate staticamente.
 
 \subsection{AlarmManager}
 Sia la registrazione che la consegna devono essere ridefinite per un completo supporto real-time. Per la registrazione vengono utilizzati degli alberi rosso neri (Figura~\ref{fig:rtalarm}), così da rendere il processo prevedibile sulla base della complessità delle operazioni sull'albero. 
@@ -52,7 +52,7 @@ La principale limitazione dell'approccio precedente è che viene data la possibi
 	\label{fig:rtdroid}
 \end{figure}
 
-Oltre ai cambiamenti introdotti precedentemente, RTDroid aggiunge costrutti real-time di alto livello, come (\textit{RealtimeService} e \textit{RealtimeReceiver}), costrutti di basso livello per la comunicazione (\textit{Realtime Channels}) e un meccanismo per specificare proprietà di questi costrutti. Le applicazioni senza vincoli temporali vengono eseguite in una VM separata. Questa modalità è utile anche per i componenti grafici delle applicazioni real-time. Figura\ref{fig:rtbootstrap} mostra il bootstrap.
+Oltre ai cambiamenti introdotti precedentemente, RTDroid aggiunge costrutti real-time di alto livello, come (\textit{RealtimeService} e \textit{RealtimeReceiver}), costrutti di basso livello per la comunicazione (\textit{Realtime Channels}) e un meccanismo per specificare proprietà di questi costrutti. Le applicazioni senza vincoli temporali vengono eseguite in una VM separata. Questa modalità è utile anche per i componenti grafici delle applicazioni real-time. Figura~\ref{fig:rtbootstrap} mostra il bootstrap.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.6\linewidth]{rtbootstrap}
@@ -60,16 +60,16 @@ Oltre ai cambiamenti introdotti precedentemente, RTDroid aggiunge costrutti real
 	\label{fig:rtbootstrap}
 \end{figure}
 
-Quest'ultima è divisa in compile time e runtime. Il processo a due fasi assicura che la memoria possa essere pre allocata e che i componenti siano correttamente configurati. Durante la compilazione viene fatto il parsing del manifest, esegue dei controlli e genera il bytecode per la configurazione di tutti i componenti coinvolti. Questo bytecode rappresenta un gestore per ogni componente dell'applicazione. All'avvio, il sistema analizza la lista dei gestori e chiama quello appropriato per istanziare il componente corrispondente. Dopo l'istanziazione, il componente viene registrato presso un \textit{Component Manager}, che ne gestisce il ciclo di vita.
+Quest'ultimo è divisa in compile time e runtime. Il processo a due fasi assicura che la memoria possa essere pre allocata e che i componenti siano correttamente configurati. Durante la compilazione viene fatto il parsing del manifest, vengono eseguiti dei controlli e viene generato il bytecode per la configurazione di tutti i componenti coinvolti. Questo bytecode rappresenta un gestore per ogni componente dell'applicazione. All'avvio, il sistema analizza la lista dei gestori e chiama quello appropriato per istanziare il componente corrispondente. Dopo l'istanziazione, il componente viene registrato presso un \textit{Component Manager}, che ne gestisce il ciclo di vita.
 
 \subsection{Componenti}
-RtDroid supporta tre diversi componenti real-time: \textit{services}, \textit{tasks} e \textit{receivers}. Un \texttt{RealtimeService} corrisponde ad un normale service Android, utilizzato per compiti aperiodici o sporadici. Dato che la nozione di computazione periodica non è presente in Android, viene introdotta la classe \texttt{PeriodicTask} per modellarla. \texttt{RealtimeReveiver}, invece, è usato per reagire ad eventi consegnati attraverso \texttt{Intent}. Non c'è bisogno di fornire un corrispettivo delle Activity. Queste ultime vengono utilizzate per la programmazione delle UI e possono essere eseguite senza vincoli temporali. L'interazione tra componenti real-time e non (UI) è permessa.
+RTDroid supporta tre diversi componenti real-time: \textit{services}, \textit{tasks} e \textit{receivers}. Un \texttt{RealtimeService} corrisponde ad un normale service Android, utilizzato per compiti aperiodici o sporadici. Dato che la nozione di computazione periodica non è presente in Android, viene introdotta la classe \texttt{PeriodicTask} per modellarla. \texttt{RealtimeReveiver}, invece, è usato per reagire ad eventi consegnati attraverso \texttt{Intent}. Non c'è bisogno di fornire un corrispettivo delle Activity. Queste ultime vengono utilizzate per la programmazione delle UI e possono essere eseguite senza vincoli temporali. L'interazione tra componenti real-time e non (UI) è permessa.
 
 Ai componenti real-time viene assegnata una priorità, un tempo di inizio, una deadline e un limite di memoria. Questo viene fatto staticamente, estendendo i tag utilizzabili nel manifest.
 
 Gestire il ciclo di vita dei componenti significa: 
 \begin{enumerate}
-	\item assicurare che priorità, deadline e periodicità;
+	\item assicurare che priorità, deadline e periodicità vengano rispettate;
 	\item gestire automaticamente la memoria allocata;
 	\item garantire che i limiti per ogni componente siano rispettati.
 \end{enumerate}
@@ -78,7 +78,7 @@ Per (2) viene utilizzata un'allocazione basata sulle regioni. L'idea è di non g
 RTDroid supporta una forma semplificata di memoria scoped. Ogni componente ha accesso a due scope: \textit{Persistent Memory}, per dati la cui vita è legata al componente, e \textit{Release Memory}, che viene pulita prima di ogni rilascio di un componente periodico. La dimensione di queste aree è definita nel manifest. La memoria totale assegnata ad un componente è la somma di peristent memory, release memory e memoria assegnata ai sotto-componenti.
 
 \paragraph{Service} \mbox{} \\
-Un service real-time è una classe astratta e un programmatore deve implementare le sue callback. Queste sono ereditate direttamente da \texttt{Service} di Android e vengono invocati nei diversi stadi del ciclo di vita. Contrariamente ad Android, che esegue i service nello stesso thread della UI, RTDroid li esegue in thread separati (mappati con i thread real-time della JVM sottostante), in modo da supportare diverse priorità. Quando viene inizializzato, ad un service viene assegnata una persistent memory che ha lo stesso tempo di vita del service stesso (allocato allo start e deallocato alla terminazione). Inoltre, se vengono utilizzati dei canali di comunicazione, le code per gli intent sono allocate nella persistent memory. Oltre ai task periodici, anche le callback eseguono utilizzando la release memory, che viene pulita al termine dell'esecuzione. La struttura è mostrata in Figura~\ref{fig:scopeservice}.
+Un service real-time è una classe astratta e un programmatore deve implementare le sue callback. Queste sono ereditate direttamente da \texttt{Service} di Android e vengono invocate nei diversi stadi del ciclo di vita. Contrariamente ad Android, che esegue i service nello stesso thread della UI, RTDroid li esegue in thread separati (mappati con i thread real-time della JVM sottostante), in modo da supportare diverse priorità. Quando viene inizializzato, ad un service viene assegnata una persistent memory che ha lo stesso tempo di vita del service stesso (allocata allo start e deallocata alla terminazione). Inoltre, se vengono utilizzati dei canali di comunicazione, le code per gli intent sono allocate nella persistent memory. Oltre ai task periodici, anche le callback eseguono utilizzando la release memory, che viene pulita al termine dell'esecuzione. La struttura è mostrata in Figura~\ref{fig:scopeservice}.
 
 Il manifest deve dichiarare quanta memoria è richiesta, in modo da dimensionare in modo corretto.
 \begin{figure}[h]
@@ -92,7 +92,7 @@ Il manifest deve dichiarare quanta memoria è richiesta, in modo da dimensionare
 Un task periodico è un sotto-componente di un service. Oltre alle caratteristiche del parent, un task ha bisogno di un periodo.
 
 \paragraph{Receiver}\mbox{} \\
-In Android, un nuovo broadcast receiver viene allocato ogni volta che un intent è ricevuto. Se tanti intent vengono inviati ad un componente, il risultato è una frequente allocazione/deallocazione. In RTDroid, invece, un receiver real-time è un costrutto persistente, e viene riutilizzato per ridurre l'impatto sulla memoria. Come conseguenza diretta,un receiver può processare un solo intent alla volta, e la logica dell'applicazione è espressa a callback. In \texttt{onReceive()} va specificato come si reagisce aglie eventi, mentre \texttt{onClean()} è usato per pulire la memoria. La sua implementazione è necessaria se si desidera avere una gestione stateless degli eventi, ed è non necessaria se vengono modificate solo variabili locali che risiedono nella release memory, che viene pulita automaticamente).
+In Android, un nuovo broadcast receiver viene allocato ogni volta che un intent è ricevuto. Se tanti intent vengono inviati ad un componente, il risultato è una frequente allocazione/deallocazione. In RTDroid, invece, un receiver real-time è un costrutto persistente, e viene riutilizzato per ridurre l'impatto sulla memoria. Come conseguenza diretta,un receiver può processare un solo intent alla volta, e la logica dell'applicazione è espressa a callback. In \texttt{onReceive()} va specificato come si reagisce aglie eventi, mentre \texttt{onClean()} è usato per pulire la memoria. La sua implementazione è necessaria se si desidera avere una gestione stateless degli eventi, ed è non necessaria se vengono modificate solo variabili locali che risiedono nella release memory, che viene pulita automaticamente.
 
 Un'importante scelta progettuale riguarda la priorità delle callback. Queste vengono eseguite alla stessa priorità dei loro componenti. Callback multiple generate da una serie di intent sono eseguite in ordine. Dal punto di vista implementativo eusto significa che un receiver è collegato ad un gestore di eventi asincrono nella JVM, che gestisce le ricezioni con una coda a priorità. Questo assicura che messaggi provenienti da mittenti ad alta priorità verranno consegnati prima. 
 
@@ -134,9 +134,9 @@ L'accodamento dei messaggi è gestito alla priorità del mittente, mentre l'estr
 
 L'invio è difficoltoso perché i messaggi sono preallocati e i mittenti non dovrebbero mantenere riferimenti ai messagi dopo che questi sono stati inviati. Il protocollo usato è quindi indiretto. Una \texttt{MessageClosure} è allocata dal mittente, e la callback \texttt{getMsg()} è usata per popolare il payload.
 
-Il riferimento al messaggio viene dato in base alla priorità del mittente. Di conseguenza l'operazione può fallire se non ci sono messaggi con quella priorità (sono tutti in uso). In questo caso viene lanciata un'eccezione. Se un componente ad alta priorità cerca di ottenere un messaggio, ma sono tutti utilizzati, può rubare un messaggio correntemente in uso da un componente non real-time a priorità più bassa. Dato che tutti i messaggi sono ottenuti durante il metodo \texttt{send} di \texttt{MessageClosure}, tutti i messaggi in uso corrispondono a messaggi accodati, ma non ricevuti. Se il messagio viene rubato viene sollevata un'eccezione asincrona, utilizzando il meccanismo \texttt{AsynchronousInterruptedException} previsto da RTSJ.
+Il riferimento al messaggio viene dato in base alla priorità del mittente. Di conseguenza l'operazione può fallire se non ci sono messaggi con quella priorità (sono tutti in uso). In questo caso viene lanciata un'eccezione. Se un componente ad alta priorità cerca di ottenere un messaggio, ma sono tutti utilizzati, può rubare un messaggio correntemente in uso da un componente non real-time a priorità più bassa. Dato che tutti i messaggi sono ottenuti durante il metodo \texttt{send} di \texttt{MessageClosure}, tutti i messaggi in uso corrispondono a messaggi accodati, ma non ricevuti. Se il messaggio viene rubato viene sollevata un'eccezione asincrona, utilizzando il meccanismo \texttt{AsynchronousInterruptedException} previsto da RTSJ.
 
-Una volta che un messaggio viene ottenuto, il mittente deve copiare i dati da inviare dal suo spazio di memoria allo spazio del canale.Questo assicura che un mittente non possa utilizzare o riempire lo spazio del destinatario direttamente, ma quest'ultimo deve accettare la ricezione. Una volta che il messaggio è copiato dall'handler del destinatario, l'oggetto del messaggio è rimesso nel pool. Questa strategia mantiene costante l'ammontare di memoria dedicata al passaggio dei messaggi. Il mittente deve utilizzare la sua memoria per memorizzare i dati che vuole inviare e non può usare le risorse del sistema finché non gli viene concesso il messaggio.
+Una volta che un messaggio viene ottenuto, il mittente deve copiare i dati da inviare dal suo spazio di memoria allo spazio del canale. Questo assicura che un mittente non possa utilizzare o riempire lo spazio del destinatario direttamente, ma è quest'ultimo a dover accettare la ricezione. Una volta che il messaggio è copiato dall'handler del destinatario, l'oggetto del messaggio è rimesso nel pool. Questa strategia mantiene costante l'ammontare di memoria dedicata al passaggio dei messaggi. Il mittente deve utilizzare la sua memoria per memorizzare i dati che vuole inviare e non può usare le risorse del sistema finché non gli viene concesso il messaggio.
 
 \paragraph{Broadcast Channel} \mbox{} \\
 Questi canali sono usati per invocare callback in componenti real-time, disaccoppiando la priorità della consegna dell'intent dall'invocazione delle callback. La differenza tra messaggi e intent è che i primi hanno un solo destinatario, mentre i secondi no e per riceverli bisogna esplicitarlo nel manifest. 
@@ -189,7 +189,7 @@ Il test vede due servizi real-time (alta priorità) che si scambiano messaggi (u
 	\item message noise, inviano un messaggio a bassa priorità al service receiver ogni 200ms.
 \end{itemize}
 
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\textwidth]{messagePassing}
