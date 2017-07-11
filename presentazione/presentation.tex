@@ -1,0 +1,50 @@
+% Adapted from UH Manoa theme by:
+% UH Manoa presentation theme for beamer
+% Jeff Delmerico <jeffdelmerico@gmail.com> 2012
+% https://github.com/jeffdelmerico/UH_Beamer_Theme.git
+
+
+\documentclass{beamer}
+%\documentclass[handout]{beamer}
+\usetheme{PD}
+
+\usepackage[absolute,overlay]{textpos}
+\usepackage{helvet}
+\usepackage{tikz}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+
+\usetikzlibrary{tikzmark,fit}
+
+\title{Making Android run on time}
+\subtitle{ }
+\author{Matteo Di Pirro}
+\date{Date...}
+\institute{Università degli Studi di Padova}
+
+\begin{document}
+
+\newcommand{\turnOffNumbers}{true} %hide frame numbers in footer
+
+\begin{frame}[noframenumbering]
+\titlepage
+\end{frame}
+
+\let\turnOffNumbers\empty
+\begin{frame}
+	\frametitle{Outline}
+	\tableofcontents
+\end{frame}
+
+\section{Java e Android real-time}
+\input{slides/javaAndroidrt}
+
+\section{Java}
+\input{slides/problemiJava}
+\input{slides/rtsj}
+
+\appendix
+\makethanks
+\renewcommand{\turnOffNumbers}{true} %hide frame numbers in footer
+% extra slides
+\end{document}
