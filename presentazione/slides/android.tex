@@ -1,0 +1,25 @@
+\begin{frame}{Limitazioni di Android real-time}
+	\begin{itemize}
+		\item Garbage collection
+		\begin{itemize}
+			\item Aggressiva
+			\item Stopping the world
+		\end{itemize}
+		\item Scheduler
+		\begin{itemize}
+			\item Completely Fair Scheduler
+		\end{itemize}
+		\item Framework Android
+		\begin{itemize}
+			\item Scambio di messaggi
+			\begin{itemize}
+				\item \texttt{Handler} e \texttt{Looper}
+			\end{itemize}
+			\item Servizi di sistema
+			\begin{itemize}
+				\item \texttt{AlarmManager}
+				\item \texttt{SensorManager}
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
