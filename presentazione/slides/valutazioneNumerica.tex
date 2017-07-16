@@ -1,0 +1,58 @@
+\begin{frame}{RTDroid - Valutazione}
+	\only<1>{
+		\begin{itemize}
+			\item Processing di un segnale audio
+			\item $D=28ms$
+		\end{itemize}
+		\begin{table}[]
+			\centering
+			\begin{tabular}{c|c|c|}
+				\cline{2-3}
+				& \multicolumn{2}{c|}{Cochlear Implant} \\ \cline{2-3} 
+				& Sampling number   & Deadlines missed   \\ \hline
+				\multicolumn{1}{|c|}{Android} & 40.000            & 5160              \\ \hline
+				\multicolumn{1}{|c|}{RTSJ}    & 40.000            & 0                 \\ \hline
+				\multicolumn{1}{|c|}{RTDroid} & 40.000            & 0                 \\ \hline
+			\end{tabular}
+		\end{table}
+	}
+
+	\only<2>{
+		\begin{itemize}
+			\item Simulazione controllo aereo
+			\begin{itemize}
+				\item Task di stabilizzazione
+			\end{itemize}
+			\item $D=50ms$
+		\end{itemize}
+		\begin{table}[]
+			\centering
+			\begin{tabular}{c|c|c|}
+				\cline{2-3}
+				& \multicolumn{2}{c|}{jPapaBench}   \\ \cline{2-3} 
+				& Sampling number & Deadlines missed \\ \hline
+				\multicolumn{1}{|c|}{Android} & 92.816          & 14              \\ \hline
+				\multicolumn{1}{|c|}{RTSJ}    & 91.791          & 0               \\ \hline
+				\multicolumn{1}{|c|}{RTDroid} & 91.840          & 0               \\ \hline
+			\end{tabular}
+		\end{table}
+	}
+
+	\only<3>{
+		\begin{itemize}
+			\item Rilevazione di rottura tramite analisi di un segnale audio
+			\item $D=50ms$
+			\item 2MB di dati da analizzare per ogni release
+		\end{itemize}
+		\begin{table}[]
+			\centering
+			\begin{tabular}{c|c|c|}
+				\cline{2-3}
+				& \multicolumn{2}{c|}{Wind Turbine Health Monitor} \\ \cline{2-3} 
+				& Sampling numer   & Deadlines missed   \\ \hline
+				\multicolumn{1}{|c|}{RTSJ}    & 2295             & 0                 \\ \hline
+				\multicolumn{1}{|c|}{RTDroid} & 2295             & 0                 \\ \hline
+			\end{tabular}
+		\end{table}
+	}
+\end{frame}
