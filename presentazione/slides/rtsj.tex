@@ -1,20 +1,57 @@
 \begin{frame}{Real-Time specification for Java \\e altre soluzioni}
-	\begin{itemize}
+	\only<1>{\begin{itemize}
 		\item Scheduling
 		\begin{itemize}
 			\item Utilizzo reale delle priorità
+			\begin{itemize}
+				\item Almeno 28 livelli, $>$ 10 (priorità più alta di un thread Java normale)
+			\end{itemize}
 			\item Basic Priority Inheritance Protocol
+			\begin{itemize}
+				\item Semplice da implementare
+				\item Nessuna conoscenza dell'utilizzo delle risorse richiesta
+				\item Evita l'inversione di priorità...
+				\item ...ma non previene deadlock
+			\end{itemize}
 			\item Ceiling Priority Protocol (opzionale)
+			\begin{itemize}
+				\item Previene inversione di priorità, deadlock e mantiene la contiguità dello stack
+				\item Ma richiede una conoscenza a priori delle risore utilizzate da ciascun thread
+			\end{itemize}
 			\item Asynchronous event handling
+			\begin{itemize}
+				\item Il sistema è event-based
+			\end{itemize}
 		\end{itemize}
+	\end{itemize}}
+	\only<2>{\begin{itemize}
 		\item Gestione della memoria
 		\begin{itemize}
 			\item Scoped
+			\begin{itemize}
+				\item Memoria organizzata a regioni
+				\item Gestita attraverso un complesso insieme di regole definito dalla RTSJ
+				\item Ad esempio, una regione (scope) non può essere ripulito finché ci sono thread che la utilizzano
+				\item La memoria viene ripulita solo quando nessuno la utilizzerà più, quindi i thread non subiscono nessun ritardo dovuto alla GC
+			\end{itemize}
 			\item Immortal
+			\begin{itemize}
+				\item Mai ripulita dal GC
+				\item Chi opera su questa memoria ha la garanzia di non essere mai interrotto dal processo di pulizia
+				\item Nessuna interferenza subita dal GC
+			\end{itemize}
 		\end{itemize}
+	\end{itemize}}
+	\only<3>{\begin{itemize}
 		\item Compilazione Ahead of time
 		\begin{itemize}
-			\item Maggiore prevedibilità
+			\item La compilazione in codice nativo viene fatta a priori
+			\begin{itemize}
+				\item Non interferisce con l'applicazione a run-time
+			\end{itemize}
+			\item Molti riferimenti (chiamate a metodi virtuali) restano irrisolti fino all'esecuzione
+			\item Lo start up è più lento, ma le prestazioni sono molto più prevedibili e comunque migliori del codice interpretato
+			\item Generalmente si compila tutto, ma il codice nativo richiede più spazio
 		\end{itemize}
-	\end{itemize}
+	\end{itemize}}
 \end{frame}

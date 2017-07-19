@@ -1,21 +1,34 @@
 \begin{frame}{Limitazioni di Java real-time}
-	\begin{itemize}
-		\item Scheduling
+	\only<1>{\begin{itemize}
+		\item<1> Scheduling
 		\begin{itemize}
 			\item Nessun utilizzo delle priorità
+			\begin{itemize}
+				\item Nessuna garanzia che un thread ''critico'' venga eseguito
+			\end{itemize}
 		\end{itemize}
-		\item Garbage collection
+		\item<1> Garbage collection
 		\begin{itemize}
 			\item Politica Stopping the world
-			\item Ritardi non quantificabili
+			\begin{itemize}
+				\item L'applicazione viene messa in pausa finché il GC pulisce la memoria
+				\item Il ritardo introdotto è variabile e non quantificabile (dimensione della memoria, aggressività)
+			\end{itemize}
+			\item Tipicamente il ritardo varia da centinaia di ms a secondi, inaccettabile per applicazioni RT
 		\end{itemize}
-		\item Caricamento dinamico delle classi
+	\end{itemize}}
+	\only<2>{\begin{itemize}
+		\item<2> Compilazione Just in time
 		\begin{itemize}
-			\item Latenza variabile e non quantificabile
+			\item La VM compila in codice nativo i metodi eseguiti più frequentemente
+			\begin{itemize}
+				\item Start up veloce, ma non si sa quando verrà fatta la compilazione
+				\item La compilazione è concorrente all'applicazione e provoca un ritardo non quantificabile
+			\end{itemize}
+			\item Viene migliorato il best case, ma la distanza tra BCET e WCET è molto elevata
+			\begin{itemize}
+				\item In un'applicazione RT quest'ultima dovrebbe essere il più piccola possibile per evitare WCET troppo pessimistici, che portano ad un utilizzo reale delle CPU troppo basso
+			\end{itemize}
 		\end{itemize}
-		\item Compilazione Just in time
-		\begin{itemize}
-			\item Distanza elevata tra BCET e WCET
-		\end{itemize}
-	\end{itemize}
+	\end{itemize}}
 \end{frame}
