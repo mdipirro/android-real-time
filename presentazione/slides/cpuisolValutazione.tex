@@ -2,14 +2,26 @@
 	Vantaggi
 	\begin{itemize}
 		\item[+] Riduzione del jitter
+		\begin{itemize}
+			\item Grazie alla minore interferenza subita
+		\end{itemize}
 		\item[+] Nessuna modifica al kernel
+		\begin{itemize}
+			\item Ma alcune limitazioni del kernel Linux restano
+		\end{itemize}
 		\item[+] Nessuna modifica dell'architettura
 	\end{itemize}
 	\vspace{20px}
 	Svantaggi
 	\begin{itemize}
-		\item[-] Nessuna interazione tra applicazioni real-time
+		\item[-] Nessun supporto allo scambio di messaggi
 		\item[-] Impedisce il risparmio energetico
+		\begin{itemize}
+			\item In contrasto alle direttive CDD
+		\end{itemize}
 		\item[-] Adatto solo ad applicazioni soft real-time
+		\begin{itemize}
+			\item Considerando che le fonti di jitter non sono annulate
+		\end{itemize}
 	\end{itemize}
 \end{frame}

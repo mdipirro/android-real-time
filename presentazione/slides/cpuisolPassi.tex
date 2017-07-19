@@ -1,19 +1,40 @@
 \begin{frame}{Isolamento di una CPU - Azioni}
-	\begin{itemize}
+	\only<1>{\begin{itemize}
 		\item Dividere le CPU in due gruppi
 		\begin{itemize}
+			\item Una sola CPU viene utilizzata a scopo real-time
+			\begin{itemize}
+				\item In questo modo è possibile fare scheduling senza preoccuparsi dei problemi derivanti da sistemi multiprocessore
+			\end{itemize}
 			\item \texttt{CONFIG\_CPUSETS}
 		\end{itemize}
 		\item Gestire l'affinità interruzioni-CPU 
 		\begin{itemize}
+			\item La gestione immediata delle interruzioni (eseguita a priorità massima) viene gestita sulle CPU non dedicate al real-time
+			\begin{itemize}
+				\item Ma non tutte le interruzioni possono essere controllate (es. Inter-processor interruptions)
+			\end{itemize}
 			\item \texttt{smp\_affinity}
 		\end{itemize}
+	\end{itemize}}
+	\only<2>{\begin{itemize}
 		\item Scheduling con \texttt{SCHED\_FIFO}
+		\begin{itemize}
+			\item Oppure \texttt{SCHED\_RR}, ma ci sono ritardi causati dalla politica round robin
+			\item \texttt{SCHED\_DEADLINE} non è supportata da Android
+		\end{itemize}
 		\item Rendere il kernel prerilasciabile 
 		\begin{itemize}
 			\item \texttt{CONFIG\_PREEMPT}
 		\end{itemize}
 		\item Fissare la frequenza della CPU
+		\begin{itemize}
+			\item Frequenze diverse possono causare differenze nei tempi di completamento 
+		\end{itemize}
 		\item Inibire il risparmio energetico
-	\end{itemize}
+		\begin{itemize}
+			\item Android impone che le CPU vadano in risparmio energetico quando idle
+			\item Questo causa un jitter altissimo dovuto ai cambiamenti di stato
+		\end{itemize}
+	\end{itemize}}
 \end{frame}

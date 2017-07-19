@@ -1,14 +1,28 @@
 \begin{frame}{RTDroid - Kernel}
-	\begin{itemize}
-		\item[-] RT Linux
+	\only<1>{
+		- RT Linux
 		\begin{itemize}
 			\item Patch \texttt{CONFIG\_PREEMPT} manuale
+			\begin{itemize}
+				\item A causa delle troppe modifiche fatte da Android
+			\end{itemize}
 			\item Cambiamenti di Android
 			\begin{itemize}
 				\item Out of Memory Killer
+				\begin{itemize}
+					\item Analizza la memoria quando è bassa e uccide un processo attivo
+					\item Momento di attivazione e ritardo introdotto non prevedibili
+				\end{itemize}
 				\item CPUFreq
+				\begin{itemize}
+					\item Adatta la frequenza delle CPU alla situazione della batteria
+					\item Frequenze diverse comportano tempi di esecuzione e risposta diversi
+					\item Differenze tra BCET e WCET elevate
+					\item Difficile prevedere quando avverrà l'adattamento e a che frequenza
+				\end{itemize}
 			\end{itemize}
-		\end{itemize}
+		\end{itemize}}
+	\only<2>{\begin{itemize}
 		\item[+] RTEMS
 		\begin{itemize}
 			\item Ottimizzato per dispositivi embedded
@@ -18,5 +32,5 @@
 				\item 256 livelli di priorità
 			\end{itemize}
 		\end{itemize}
-	\end{itemize}
+	\end{itemize}}
 \end{frame}
