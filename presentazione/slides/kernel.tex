@@ -1,48 +1,47 @@
-\begin{frame}{RTDroid - Kernel}
-	\only<1>{
-		- RT Linux
+\begin{frame}{RTDroid - Kernel /1}
+	- RT Linux
+	\begin{itemize}
+		\item Patch \texttt{CONFIG\_PREEMPT} manuale
 		\begin{itemize}
-			\item Patch \texttt{CONFIG\_PREEMPT} manuale
-			\begin{itemize}
-				\item A causa delle troppe modifiche fatte da Android
-			\end{itemize}
-			\item Cambiamenti di Android
-			\begin{itemize}
-				\item Out of Memory Killer
-				\begin{itemize}
-					\item Analizza la memoria quando è bassa e uccide un processo attivo
-					\item Momento di attivazione e ritardo introdotto non prevedibili
-				\end{itemize}
-				\item CPUFreq
-				\begin{itemize}
-					\item Adatta la frequenza delle CPU alla situazione della batteria
-					\item Frequenze diverse comportano tempi di esecuzione e risposta diversi
-					\item Differenze tra BCET e WCET elevate
-					\item Difficile prevedere quando avverrà l'adattamento e a che frequenza
-				\end{itemize}
-			\end{itemize}
-		\end{itemize}}
-	\only<2>{\begin{itemize}
-		\item[+] RTEMS
+			\item A causa delle troppe modifiche fatte da Android
+		\end{itemize}
+		\item Cambiamenti di Android
 		\begin{itemize}
-			\item Event-driven
+			\item Out of Memory Killer
 			\begin{itemize}
-				\item Nessun ritardo dovuto al tick dell'orologio
-				\item Nessuno spazio aggiuntivo richiesto per la coda dei ``pronti ma non visti''
+				\item Analizza la memoria quando è bassa e uccide un processo attivo
+				\item Momento di attivazione e ritardo introdotto non prevedibili
 			\end{itemize}
-			\item Ottimizzato per dispositivi embedded
-			\item Scheduling configurabile
+			\item CPUFreq
 			\begin{itemize}
-				\item Fixed-priority di default
-				\item 256 livelli di priorità
-			\end{itemize}
-			\item Gestione delle risorse con BPIP o PCP
-			\item Gestione immediata delle interruzioni il più breve possibile
-			\begin{itemize}
-				\item Tempo di gestione dipendente dall'architettura
-				\item La parte non immediata viene gestita dall'applicazione
-				\item Ogni interruzione è identificata da un numero: 256 livelli disponibili
+				\item Adatta la frequenza delle CPU alla situazione della batteria
+				\item Frequenze diverse comportano tempi di esecuzione e risposta diversi
+				\item Differenze tra BCET e WCET elevate
+				\item Difficile prevedere quando avverrà l'adattamento e a che frequenza
 			\end{itemize}
 		\end{itemize}
-	\end{itemize}}
+	\end{itemize}
+\end{frame}
+\begin{frame}{RTDroid - Kernel /2}
+	+ RTEMS
+	\begin{itemize}
+		\item Event-driven
+		\begin{itemize}
+			\item Nessun ritardo dovuto al tick dell'orologio
+			\item Nessuno spazio aggiuntivo richiesto per la coda dei ``pronti ma non visti''
+		\end{itemize}
+		\item Ottimizzato per dispositivi embedded
+		\item Scheduling configurabile
+		\begin{itemize}
+			\item Fixed-priority di default
+			\item 256 livelli di priorità
+		\end{itemize}
+		\item Gestione delle risorse con BPIP o PCP
+		\item Gestione immediata delle interruzioni il più breve possibile
+		\begin{itemize}
+			\item Tempo di gestione dipendente dall'architettura
+			\item La parte non immediata viene gestita dall'applicazione
+			\item Ogni interruzione è identificata da un numero: 256 livelli disponibili
+		\end{itemize}
+	\end{itemize}
 \end{frame}

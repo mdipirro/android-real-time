@@ -1,5 +1,5 @@
-\begin{frame}{RTDroid - Componenti}
-	\only<1>{\begin{itemize}
+\begin{frame}{RTDroid - Componenti /1}
+	\begin{itemize}
 		\item Base: Memoria scoped dimensionata staticamente
 		\begin{itemize}
 			\item Il dimensionamento degli scopes è in genere complicato
@@ -20,8 +20,10 @@
 				\item Pulita alla fine di ogni release, quindi il job non viene interferito dal GC
 			\end{itemize}
 		\end{itemize}
-	\end{itemize}}
-	\only<2>{\begin{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{RTDroid - Componenti /2}
+	\begin{itemize}
 		\item \texttt{RealtimeService}
 		\begin{itemize}
 			\item Eseguiti in thread separati dalla UI e mappati con thread real-time
@@ -36,13 +38,15 @@
 				\item Richiesto anche il periodo
 			\end{itemize}
 		\end{itemize}
-	\end{itemize}}
-	\only<3>{\begin{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{RTDroid - Componenti /3}
+	\begin{itemize}
 		\item \texttt{RealtimeReceiver}
 		\begin{itemize}
 			\item Un solo \texttt{Receiver} per componente. Gli intent vengono processati uno alla volta, ma si evitano numerose allocazioni/cancellazioni (come in Android)
 			\item Intent accodati alla priorità del mittente, così messaggi a priorità alta verranno visti prima
 			\item Intent processati alla priorità del ricevente, così la gestione non ritarda thread a priorità alta
 		\end{itemize}
-	\end{itemize}}
+	\end{itemize}
 \end{frame}

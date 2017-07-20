@@ -1,5 +1,5 @@
-\begin{frame}{Limitazioni di Android real-time}
-	\only<1>{\begin{itemize}
+\begin{frame}{Limitazioni di Android real-time /1}
+	\begin{itemize}
 		\item La memoria disponibile è generalmente poca
 		\begin{itemize}
 			\item Garbage collection molto aggressiva
@@ -9,8 +9,10 @@
 				\item Il tempo richiesto per lo scheduling diventa così altissimo
 			\end{itemize}
 		\end{itemize}
-	\end{itemize}}
-	\only<2>{\begin{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{Limitazioni di Android real-time /2}
+	\begin{itemize}
 		\item Completely Fair Scheduler
 		\begin{itemize}
 			\item La coda dei pronti è gestita con un albero rosso nero
@@ -30,8 +32,10 @@
 			\end{itemize}
 			ma di default viene utilizzata \texttt{SCHED\_OTHER}, che non tiene conto della priorità
 		\end{itemize}
-	\end{itemize}}
-	\only<3>{
+	\end{itemize}
+\end{frame}
+\begin{frame}{Limitazioni di Android real-time /3}
+	\only<1>{
 		\begin{textblock*}{10cm}(2.7cm, 3.5cm)
 			struct sched\_entity \{ \\
 			\mbox{~~~~}... \\
@@ -43,7 +47,7 @@
 			\}
 		\end{textblock*}
 	}
-	\only<4>{
+	\only<2>{
 		\begin{textblock*}{10cm}(2.7cm, 3cm)
 			struct sched\_entity \{\\
 			\mbox{~~~~}... \\
@@ -58,7 +62,9 @@
 			$delta\_exec\_weighted = delta\_exec * \frac{NICE\_0\_LOAD}{load\_weight}$
 		\end{textblock*}
 	}
-	\only<5>{\begin{itemize}
+\end{frame}
+\begin{frame}{Limitazioni di Android real-time /4}
+	\begin{itemize}
 		\item Scambio di messaggi
 		\begin{itemize}
 			\item \texttt{Handler} e \texttt{Looper}
@@ -79,5 +85,5 @@
 				\item La notifica utilizza \texttt{Handler} e \texttt{Looper}, con ritardi variabili
 			\end{itemize}
 		\end{itemize}
-	\end{itemize}}
+	\end{itemize}
 \end{frame}

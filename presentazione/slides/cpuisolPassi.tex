@@ -1,5 +1,5 @@
-\begin{frame}{Isolamento di una CPU - Azioni}
-	\only<1>{\begin{itemize}
+\begin{frame}{Isolamento di una CPU - Azioni /1}
+	\begin{itemize}
 		\item Dividere le CPU in due gruppi
 		\begin{itemize}
 			\item Una sola CPU viene utilizzata a scopo real-time
@@ -16,8 +16,10 @@
 			\end{itemize}
 			\item \texttt{smp\_affinity}
 		\end{itemize}
-	\end{itemize}}
-	\only<2>{\begin{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{Isolamento di una CPU - Azioni /2}
+	\begin{itemize}
 		\item Scheduling con \texttt{SCHED\_FIFO}
 		\begin{itemize}
 			\item Oppure \texttt{SCHED\_RR}, ma ci sono ritardi causati dalla politica round robin
@@ -36,5 +38,5 @@
 			\item Android impone che le CPU vadano in risparmio energetico quando idle
 			\item Questo causa un jitter altissimo dovuto ai cambiamenti di stato
 		\end{itemize}
-	\end{itemize}}
+	\end{itemize}
 \end{frame}

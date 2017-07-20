@@ -1,13 +1,13 @@
-\begin{frame}{Limitazioni di Java real-time}
-	\only<1>{\begin{itemize}
-		\item<1> Scheduling
+\begin{frame}{Limitazioni di Java real-time /1}
+	\begin{itemize}
+		\item Scheduling
 		\begin{itemize}
 			\item Nessun utilizzo delle priorità
 			\begin{itemize}
 				\item Nessuna garanzia che un thread ``critico'' venga eseguito
 			\end{itemize}
 		\end{itemize}
-		\item<1> Garbage collection
+		\item Garbage collection
 		\begin{itemize}
 			\item Politica Stopping the world
 			\begin{itemize}
@@ -16,9 +16,11 @@
 			\end{itemize}
 			\item Tipicamente il ritardo varia da centinaia di ms a secondi, inaccettabile per applicazioni RT
 		\end{itemize}
-	\end{itemize}}
-	\only<2>{\begin{itemize}
-		\item<2> Compilazione Just in time
+	\end{itemize}
+\end{frame}
+\begin{frame}{Limitazioni di Java real-time /2}
+	\begin{itemize}
+		\item Compilazione Just in time
 		\begin{itemize}
 			\item La VM compila in codice nativo i metodi eseguiti più frequentemente
 			\begin{itemize}
@@ -30,5 +32,5 @@
 				\item In un'applicazione RT quest'ultima dovrebbe essere il più piccola possibile per evitare WCET troppo pessimistici, che portano ad un utilizzo reale delle CPU troppo basso
 			\end{itemize}
 		\end{itemize}
-	\end{itemize}}
+	\end{itemize}
 \end{frame}
