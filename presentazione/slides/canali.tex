@@ -4,19 +4,19 @@
 		\begin{itemize}
 			\item Punto a punto
 			\item Broadcast
-			\item Bulk
-			\item Cross context
+			\item Bulk data, per dati di grosse dimensioni
+			\item Cross context, per comunicare con Android
 		\end{itemize}
-		\item Proprietà statiche
+		\item Proprietà statiche dichiarate in \texttt{manifest.xml}
 		\begin{itemize}
-			\item Dichiarate in \texttt{manifest.xml}
-			\item Messaggi preallocati
-			\item Limite ai messaggi ricevuti ed inviati
-			\item Controlli
+			\item C'è un limite ai messaggi utilizzabili contemporaneamente
 			\begin{itemize}
-				\item Limiti di memoria
-				\item Channel overflow
+				\item Code salvate nella persistent memory
 			\end{itemize}
+			\item In questo modo si assicura che la memoria preallocata non venga esaurita
+			\item I messaggi sono preallocati
+			\item Limite ai messaggi ricevuti ed inviati
 		\end{itemize}
+		\item I limiti statici aiutano ad assicurare che l'occupazione di memoria non superi una certa soglia. Di conseguenza la GC non è necessaria
 	\end{itemize}
 \end{frame}

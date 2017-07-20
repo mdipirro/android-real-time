@@ -1,0 +1,13 @@
+\begin{frame}{RTDroid - Bulk data Channel}
+	\begin{itemize}
+		\item Gestiti secondo la modalità zero-copy
+		\item Il mittente salva i dati che vuole trasferire in un suo scope...
+		\item ...e cede l'accesso dello scope ad un altro componente
+		\item In questo modo l'unica copia richiesta è quella del puntatore allo scope
+		\item Il mittente non può più scrivere, ma è corretto
+		\item Il tempo di trasferimento è quasi costante ed indipendente dalla dimensione dei dati
+		\begin{itemize}
+			\item Di conseguenza il tempo di esecuzione può non tenere conto del trasferimento
+		\end{itemize}
+	\end{itemize}
+\end{frame}

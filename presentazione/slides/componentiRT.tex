@@ -1,19 +1,48 @@
 \begin{frame}{RTDroid - Componenti}
-	\begin{itemize}
-		\item Base: Memoria scoped
+	\only<1>{\begin{itemize}
+		\item Base: Memoria scoped dimensionata staticamente
 		\begin{itemize}
+			\item Il dimensionamento degli scopes è in genere complicato
+			\begin{itemize}
+				\item In RTDroid viene fatto basandosi sulla quantità dichiarata in \texttt{manifest.xml}
+				\item Punto debole: ci si affida ai programmatori
+			\end{itemize}
+			\item Deve essere gestita correttamente, e per questo non è direttamente esposta, ma gestita dal framework
 			\item Persistent scope
+			\begin{itemize}
+				\item I task vengono salvati qui
+				\item La memoria scoped non viene ripulita finché ci sono thread che operano in essa
+				\item In questo modo nessuno paga il ritardo della GC, perché non c'è GC finché c'è almeno un thread vivo
+			\end{itemize}
 			\item Release scope
+			\begin{itemize}
+				\item Utilizzata per i job: callback (per aperiodici o sporadici) e comportamenti periodici
+				\item Pulita alla fine di ogni release, quindi il job non viene interferito dal GC
+			\end{itemize}
 		\end{itemize}
+	\end{itemize}}
+	\only<2>{\begin{itemize}
 		\item \texttt{RealtimeService}
 		\begin{itemize}
+			\item Eseguiti in thread separati dalla UI e mappati con thread real-time
 			\item Task sporadici o aperiodici
+			\begin{itemize}
+				\item Parametri: priorità, deadline, release time e limite di memoria
+				\item Nessuna conoscenza del tempo di esecuzione
+				\item Nessuna garanzia di minimum inter-arrival time per i task sporadici
+			\end{itemize}
 			\item \texttt{Periodictask}
+			\begin{itemize}
+				\item Richiesto anche il periodo
+			\end{itemize}
 		\end{itemize}
+	\end{itemize}}
+	\only<3>{\begin{itemize}
 		\item \texttt{RealtimeReceiver}
 		\begin{itemize}
-			\item Intent accodati alla priorità del mittente...
-			\item ...e processati alla priorità del ricevente
+			\item Un solo \texttt{Receiver} per componente. Gli intent vengono processati uno alla volta, ma si evitano numerose allocazioni/cancellazioni (come in Android)
+			\item Intent accodati alla priorità del mittente, così messaggi a priorità alta verranno visti prima
+			\item Intent processati alla priorità del ricevente, così la gestione non ritarda thread a priorità alta
 		\end{itemize}
-	\end{itemize}
+	\end{itemize}}
 \end{frame}

@@ -1,0 +1,16 @@
+\begin{frame}{Fiji - Valutazione}
+	\begin{itemize}
+		\item La compilazione AOT aiuta a mantenere controllata la distanza tra BCET e WCET
+		\item Le prestazioni risentono della mancanza della compilazione JIT, ma sono più stabili
+		\item Vengono fatte numerose ottimizzazioni per eliminare path ridondanti
+		\begin{itemize}
+			\item Null pointers
+			\item Check delle dimensioni degli array
+		\end{itemize}
+		\item GC non stopping the world
+		\begin{itemize}
+			\item L'applicazione non deve essere bloccata mentre la memoria viene pulita
+			\item Ritardi più controllati
+		\end{itemize}
+	\end{itemize}
+\end{frame}

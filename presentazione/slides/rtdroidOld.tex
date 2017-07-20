@@ -1,5 +1,5 @@
 \begin{frame}{RTDroid - Prime modifiche}
-	\begin{itemize}
+	\only<1>{\begin{itemize}
 		\item \texttt{RT Looper}
 		\begin{itemize}
 			\item Messaggi con priorità
@@ -7,22 +7,38 @@
 				\item Inheritance
 				\item Inheritance + specified
 			\end{itemize}
+		\item In questo modo ogni messaggio ha associata la priorità del suo mittente, e il ricevente può processare prima i messaggi più importanti
 		\end{itemize}
 		\item \texttt{RT Handler}
 		\begin{itemize}
 			\item Coda FIFO con priorità
 			\begin{itemize}
-				\item Dimensionabile staticamente
+				\item Dimensionabile staticamente inserendo in \texttt{manifest.xml} il numero massimo di messaggi che un thread può ricevere
+				\item Se la dimensione non è corretta alcuni messaggi di thread a bassa priorità potrebbero non essere recapitati
 			\end{itemize}
 		\end{itemize}
+	\end{itemize}}
+	\only<2>{\begin{itemize}
 		\item \texttt{AlarmManager}
 		\begin{itemize}
 			\item Ordinamento con alberi rosso neri
+			\begin{itemize}
+				\item Un albero ordina i timestamps degli allarmi
+				\item Un albero per timestamp ordina i richiedenti per priorità
+				\item Assicura che chi ha priorità più alta venga servito prima, ma potenzialmente chiede molta memoria
+			\end{itemize}
 		\end{itemize}
 		\item \texttt{SensorManager}
 		\begin{itemize}
 			\item Polling thread con priorità massima
+			\begin{itemize}
+				\item Così i dati raw vengono raccolti nei momenti giusti, senza rischiare che un ritardo nel raccoglimento causi errori nelle risposte
+			\end{itemize}
 			\item Processing thread con priority inheritance
+			\begin{itemize}
+				\item I thread che interpretano i dati raw (uno per sensore) eseguono alla priorità massima di chi ha chiesto i dati
+				\item Non preserva l'indipendenza, perché anche i thread a priorità più bassa beneficiano del boosting
+			\end{itemize}
 		\end{itemize}
-	\end{itemize}
+	\end{itemize}}
 \end{frame}

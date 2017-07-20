@@ -25,11 +25,23 @@
 	\only<2>{\begin{itemize}
 		\item[+] RTEMS
 		\begin{itemize}
+			\item Event-driven
+			\begin{itemize}
+				\item Nessun ritardo dovuto al tick dell'orologio
+				\item Nessuno spazio aggiuntivo richiesto per la coda dei ``pronti ma non visti''
+			\end{itemize}
 			\item Ottimizzato per dispositivi embedded
 			\item Scheduling configurabile
 			\begin{itemize}
 				\item Fixed-priority di default
 				\item 256 livelli di priorità
+			\end{itemize}
+			\item Gestione delle risorse con BPIP o PCP
+			\item Gestione immediata delle interruzioni il più breve possibile
+			\begin{itemize}
+				\item Tempo di gestione dipendente dall'architettura
+				\item La parte non immediata viene gestita dall'applicazione
+				\item Ogni interruzione è identificata da un numero: 256 livelli disponibili
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}}

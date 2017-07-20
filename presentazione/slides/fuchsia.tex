@@ -1,4 +1,38 @@
 \begin{frame}{Conclusioni - Fuchsia}
-	\vspace{-0.5cm}
-	\centering\includegraphics[scale=0.25]{androidtofuchsia}
+	\only<1>{
+		\vspace{-0.5cm}
+		\centering\includegraphics[scale=0.25]{androidtofuchsia}
+	}
+
+	\only<2>{
+		\begin{itemize}
+			\item Nuovo sistema operativo attualmente in fase di sviluppo
+			\item Kernels real-time nativi
+			\begin{itemize}
+				\item Little kernel per dispositivi con risorse limitate
+				\item Magenta (by Google) per dispositivi embedded con vincoli di risorse meno stringenti
+				\item Scritti prevalentemente in C/C++
+			\end{itemize}
+		\end{itemize}
+	}
+	\only<3>{
+		\begin{itemize}
+			\item Le applicazioni sono scritte in Dart
+			\begin{itemize}
+				\item È presente una VM
+				\item Tutti gli oggetti sono allocati sullo heap
+				\item Due tipi di oggetti
+				\begin{itemize}
+					\item Short-lived, allocati in un'area chiamata \textit{new generation} la cui collection è ottimizzata e veloce (circa 2 $ms$)
+					\item Long-lived, allocati nello heap ``classico''
+					\item I primi hanno un tempo di vita molto corto e non occupano molto spazio, quindi sono adatti ad un uso in contesti real-time
+				\end{itemize}
+				\item Modello di concorrenza a \textit{isolates}, simili agli attori di Scala/Akka
+				\begin{itemize}
+					\item La comunicazione avviene tramite lo scambio di messaggi e non con memoria condivisa
+					\item Facilmente analizzabile staticamente e senza rischio di data races
+				\end{itemize}
+			\end{itemize}
+		\end{itemize}
+	}
 \end{frame}
