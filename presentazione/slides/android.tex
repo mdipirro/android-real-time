@@ -15,15 +15,15 @@
 	\begin{itemize}
 		\item Completely Fair Scheduler
 		\begin{itemize}
-			\item La coda dei pronti è gestita con un albero rosso nero
-			\begin{itemize}
-				\item Costo $O(log(n))$ per inserimenti e cancellazioni, molto maggiore di $O(1)$ richiesto da un array indicizzato per priorità
-				\item Costo maggiore per la memorizzazione in memoria
-			\end{itemize}
 			\item CFS ha come obiettivo la fairness, in contrasto con i sistemi real-time
 			\begin{itemize}
 				\item Un thread ad alta priorità può essere ``scavalcato'' da uno a priorità molto più bassa
 				\item Non si tiene conto delle deadlines
+			\end{itemize}
+			\item La coda dei pronti è gestita con un albero rosso nero
+			\begin{itemize}
+				\item Costo $O(log(n))$ per inserimenti e cancellazioni, molto maggiore di $O(1)$ richiesto da un array indicizzato per priorità
+				\item Costo maggiore per la memorizzazione in memoria
 			\end{itemize}
 			\item Due politiche real-time sono supportate dal kernel Linux di Android
 			\begin{itemize}
@@ -71,18 +71,6 @@
 			\begin{itemize}
 				\item Nessun supporto delle priorità
 				\item Coda ordinata dinamicamente: un messaggio proveniente da un thread ad alta priorità non ha garanzia di essere ricevuto velocemente
-			\end{itemize}
-		\end{itemize}
-		\item Servizi di sistema
-		\begin{itemize}
-			\item \texttt{AlarmManager}
-			\begin{itemize}
-				\item Nessuna garanzia sul tempo di notifica
-			\end{itemize}
-			\item \texttt{SensorManager}
-			\begin{itemize}
-				\item Nessun supporto alle priorità: thread a priorità più alta possono essere notificati dopo thread a priorità bassa
-				\item La notifica utilizza \texttt{Handler} e \texttt{Looper}, con ritardi variabili
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}

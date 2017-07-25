@@ -1,0 +1,16 @@
+\begin{frame}{Limitazioni di Android real-time /5}
+	\begin{itemize}
+		\item Servizi di sistema
+		\begin{itemize}
+			\item \texttt{AlarmManager}
+			\begin{itemize}
+				\item Nessuna garanzia sul tempo di notifica
+			\end{itemize}
+			\item \texttt{SensorManager}
+			\begin{itemize}
+				\item Nessun supporto alle priorità: thread a priorità più alta possono essere notificati dopo thread a priorità bassa
+				\item La notifica utilizza \texttt{Handler} e \texttt{Looper}, con ritardi variabili
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
