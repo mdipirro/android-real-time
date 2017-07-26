@@ -1,46 +1,62 @@
 \begin{frame}{RTDroid - Prime modifiche /1}
+	\texttt{RT Handler e Looper}
 	\begin{itemize}
-		\item \texttt{RT Handler}
+		\item Messaggi con priorità
 		\begin{itemize}
-			\item Messaggi con priorità
-			\begin{itemize}
-				\item Inheritance
-				\item Inheritance + specified
-			\end{itemize}
-		\item In questo modo ogni messaggio ha associata la priorità del suo mittente, e il ricevente può processare prima i messaggi più importanti
+			\item Inheritance
+			\item Inheritance + specified
+			\item In questo modo ogni messaggio ha associata la priorità del suo mittente, e il ricevente può processare prima i messaggi più importanti
 		\end{itemize}
-		\item \texttt{RT Looper}
+		\item Più code FIFO con priorità
 		\begin{itemize}
-			\item Coda FIFO con priorità
-			\begin{itemize}
-				\item Dimensionabile staticamente inserendo in \texttt{manifest.xml} il numero massimo di messaggi che un thread può ricevere
-				\item Se la dimensione non è corretta alcuni messaggi di thread a bassa priorità potrebbero non essere recapitati
-			\end{itemize}
+			\item Dimensionabili staticamente inserendo in \texttt{manifest.xml} il numero massimo di messaggi che un thread può ricevere
+			\item Se la dimensione non è corretta alcuni messaggi (!)
+			\item Un \texttt{Looper} e un \texttt{Handler} per ogni coda
 		\end{itemize}
 	\end{itemize}
 \end{frame}
 \begin{frame}{RTDroid - Prime modifiche /2}
+	\texttt{AlarmManager}
 	\begin{itemize}
-		\item \texttt{AlarmManager}
+		\item Ordinamento con alberi rosso neri
 		\begin{itemize}
-			\item Ordinamento con alberi rosso neri
+			\item Un albero ordina i timestamps degli allarmi
+			\item Un albero per timestamp ordina i richiedenti per priorità
+			\item Assicura che chi ha priorità più alta venga servito prima, ma potenzialmente chiede molta memoria
+		\end{itemize}
+		\item I componenti sono notificati attraverso gli \texttt{Asynchronous Event Handlers} della RTSJ
+		\begin{itemize}
+			\item Creando un thread per ogni handler
 			\begin{itemize}
-				\item Un albero ordina i timestamps degli allarmi
-				\item Un albero per timestamp ordina i richiedenti per priorità
-				\item Assicura che chi ha priorità più alta venga servito prima, ma potenzialmente chiede molta memoria
+				\item Buona soluzione se ci sono pochi allarmi da gestire (come solitamente accade)
+				\item Grosso overhead di CPU e memoria se invece ce ne sono tanti
+			\end{itemize}
+			\item Utilizzando un pool di thread dimensionato staticamente
+			\begin{itemize}
+				\item Riduce il numero di thread da allocare
+				\item Limite di memoria e CPU richiesto conosciuto staticamente
+				\item Difficile dimensionare il pool (sottodimensionamento e sovradimensionamento)
 			\end{itemize}
 		\end{itemize}
-		\item \texttt{SensorManager}
+	\end{itemize}
+\end{frame}
+\begin{frame}{RTDroid - Prime modifiche /3}
+	\texttt{SensorManager}
+	\begin{itemize}
+		\item Polling thread con priorità massima (periodico)
 		\begin{itemize}
-			\item Polling thread con priorità massima
-			\begin{itemize}
-				\item Così i dati raw vengono raccolti nei momenti giusti, senza rischiare che un ritardo nel raccoglimento causi errori nelle risposte
-			\end{itemize}
-			\item Processing thread con priority inheritance
-			\begin{itemize}
-				\item I thread che interpretano i dati raw (uno per sensore) eseguono alla priorità massima di chi ha chiesto i dati
-				\item Non preserva l'indipendenza, perché anche i thread a priorità più bassa beneficiano del boosting
-			\end{itemize}
+			\item Così i dati raw vengono raccolti nei momenti giusti, senza rischiare che un ritardo nel raccoglimento causi errori nelle risposte
+		\end{itemize}
+		\item Processing thread con priority inheritance
+		\begin{itemize}
+			\item I thread che interpretano i dati raw (uno per sensore) eseguono alla priorità massima di chi ha chiesto i dati
+			\item Non preserva l'indipendenza, perché anche i thread a priorità più bassa beneficiano del boosting (ma di fatto è inevitabile)
+		\end{itemize}
+		\item Un delivery thread notifica il componente invocando la callback corrispondente
+		\begin{itemize}
+			\item Comunicazione attraverso RT \texttt{Looper} e \texttt{Handler}
+			\item La callback viene eseguita alla priorità del componente che aveva richiesto i dati
+			\item Nessuna inversione di priorità e indipendenza preservata
 		\end{itemize}
 	\end{itemize}
 \end{frame}
